@@ -13,24 +13,35 @@ export function registerUploadRoutes(app: Express, verifyToken: any) {
   // POST /api/upload/url - Generate signed upload URL
   app.post("/api/upload/url", verifyToken, async (req: any, res: Response) => {
     try {
-      const { fileName, contentType, folder, fileType } = req.body;
+      const { fileName, contentType, resourceId, fileType } = req.body;
       
-      if (!fileName || !contentType || !folder) {
-        return res.status(400).json({ error: "fileName, contentType, and folder are required" });
+      if (!fileName || !contentType || !resourceId || !fileType) {
+        return res.status(400).json({ 
+          error: "fileName, contentType, resourceId, and fileType are required" 
+        });
       }
       
       // Validate file type based on category
       let allowedTypes: string[];
       let maxSize: number;
+      let resourceType: "client" | "attendance" | "quotation";
       
       if (fileType === "document") {
         allowedTypes = ALLOWED_DOCUMENT_TYPES;
         maxSize = MAX_DOCUMENT_SIZE_MB;
-      } else if (fileType === "image" || fileType === "selfie") {
+        resourceType = "client"; // Documents are for clients
+      } else if (fileType === "selfie") {
         allowedTypes = ALLOWED_IMAGE_TYPES;
         maxSize = MAX_IMAGE_SIZE_MB;
+        resourceType = "attendance"; // Selfies are for attendance
+      } else if (fileType === "image") {
+        allowedTypes = ALLOWED_IMAGE_TYPES;
+        maxSize = MAX_IMAGE_SIZE_MB;
+        resourceType = "quotation"; // Images can be for quotations
       } else {
-        return res.status(400).json({ error: "Invalid fileType. Must be 'document', 'image', or 'selfie'" });
+        return res.status(400).json({ 
+          error: "Invalid fileType. Must be 'document', 'image', or 'selfie'" 
+        });
       }
       
       if (!validateFileType(fileName, allowedTypes)) {
@@ -39,11 +50,12 @@ export function registerUploadRoutes(app: Express, verifyToken: any) {
         });
       }
       
-      // Generate upload URL
+      // Generate upload URL with secure folder structure
       const { uploadUrl, downloadUrl, path } = await generateUploadUrl(
-        folder,
+        resourceId, // This becomes the subfolder under the resource type
         fileName,
-        contentType
+        contentType,
+        resourceType
       );
       
       res.json({
