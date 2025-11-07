@@ -25,6 +25,8 @@ export interface UserProfile {
 export async function signInWithEmail(email: string, password: string) {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
+    // Force token refresh to get custom claims (including role)
+    await result.user.getIdToken(true);
     return result.user;
   } catch (error: any) {
     throw new Error(error.message || "Failed to sign in");
@@ -117,8 +119,9 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
       // Get role from custom claims (more secure)
       const user = auth.currentUser;
       if (user) {
-        const idTokenResult = await user.getIdTokenResult();
-        profile.role = (idTokenResult.claims.role as UserRole) || "agent";
+        // Force refresh to ensure we have latest custom claims
+        const idTokenResult = await user.getIdTokenResult(true);
+        profile.role = (idTokenResult.claims.role as UserRole) || profile.role || "agent";
       }
       
       return profile;

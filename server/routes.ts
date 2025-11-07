@@ -91,6 +91,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/auth/sync-roles - Sync roles from Firestore to custom claims (for fixing existing users)
+  app.get("/api/auth/sync-roles", async (req: Request, res: Response) => {
+    try {
+      const usersSnapshot = await adminDb.collection("users").get();
+      const results = [];
+
+      for (const userDoc of usersSnapshot.docs) {
+        const userData = userDoc.data();
+        const { uid, role, email } = userData;
+
+        if (uid && role) {
+          // Set custom claims based on Firestore role
+          await adminAuth.setCustomUserClaims(uid, { role });
+          results.push({ uid, email, role, status: "synced" });
+        }
+      }
+
+      res.json({ message: "Roles synced successfully", results });
+    } catch (error: any) {
+      console.error("Error syncing roles:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Import client routes
   const clientRoutes = await import("./routes/clients");
   clientRoutes.registerClientRoutes(app);
