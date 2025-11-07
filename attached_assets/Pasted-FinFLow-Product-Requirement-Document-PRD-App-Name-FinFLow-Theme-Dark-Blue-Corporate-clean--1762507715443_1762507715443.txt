@@ -1,0 +1,223 @@
+FinFLow – Product Requirement Document (PRD)
+App Name: FinFLow
+Theme: Dark Blue Corporate (clean, professional UI)
+Design Goal: Seamless user experience across all workflows (web + mobile responsive)
+Currency: INR (₹) — Indian numbering format (Lakhs/Crores)
+
+
+FinFLow is a complete loan finance management system for companies offering multiple types of loans. It helps manage client onboarding, loan tracking, top-up reminders, field agent operations, quotations, payroll, and attendance — with clear visibility for managers and directors.
+________________________________________
+Roles
+•	Admin
+•	Agent
+•	Managing Director (MD)
+Core Objectives
+1.	Onboard clients with full details and documents.
+2.	Manage and track multiple loan types.
+3.	Handle quotations, including high-value visibility.
+4.	Notify for top-up eligibility after fixed tenure (e.g., 12 months).
+5.	Provide attendance with live location, selfie, and purpose.
+6.	Manage employee, payroll, and performance metrics.
+7.	Enable MD to view all business metrics and flagged cases.
+________________________________________
+1. Dashboard & Client Management
+Features
+•	Add new clients with KYC, income proof, employment details, and loan preference.
+•	Maintain complete client history (loans, top-ups, documents, quotations).
+•	Track loan statuses:
+o	New / Contacted / In Progress / Converted / Not Converted
+•	Top-Up Reminder System:
+o	Automatically identifies clients eligible for top-up after tenure (default 12 months).
+o	Displays reminders in dashboard and sends notifications to Admin/Agents.
+________________________________________
+2. Agent Role
+Key Functions
+•	Onboard clients during field visits using a mobile-friendly interface.
+•	Collect and upload documents (PDF, JPG, PNG).
+•	Create and generate quotations instantly (PDF) on-site.
+•	Add notes and submit client data to the Admin dashboard automatically.
+•	Mark attendance with live selfie and GPS (see attendance module).
+Quotation Generation
+•	Agents can create loan quotations for any client.
+•	Instant PDF Generation: Agents can download and share with the client immediately on-site.
+•	System automatically checks if quotation exceeds company-defined thresholds (loan amount, interest rate, tenure).
+•	If limits exceeded → mark quotation as “High-Value” (visual tag, not approval-blocking).
+•	Quotation automatically saved to Admin and MD dashboards for review visibility.
+________________________________________
+3. Admin Role
+Responsibilities
+•	Review client submissions and quotations created by agents.
+•	Manage quotation templates and approve if needed.
+•	Handle top-up reminders and follow-up lists.
+•	Update and track loan process stages (6-step bank progress).
+•	Manage attendance and payroll of agents.
+•	Configure system policies (loan thresholds, attendance radius, etc.).
+________________________________________
+4. High-Value Quotation Visibility (MD Oversight Logic)
+Overview
+A High-Value Quotation is automatically flagged by the system when a quotation exceeds defined financial or policy thresholds — but it is not blocked or delayed.
+Agents can generate the PDF instantly; the MD simply sees it flagged in their dashboard for awareness.
+________________________________________
+Purpose
+•	Allow field agents to operate freely and instantly.
+•	Give MD full visibility into high-value deals.
+•	Maintain flexibility to turn on approvals in the future (optional setting).
+________________________________________
+ Configurable Thresholds
+Parameter	Default Limit	Description
+Loan Amount	> ₹10,00,000	Flagged as high-value
+Interest Rate	< 12%	Flagged if interest rate below minimum
+Tenure	> 60 months	Flagged if unusually long term
+Product	Custom	Different limits by loan type (optional)
+Limits editable under Settings → Policy Configuration by Admin or MD.
+________________________________________
+Workflow
+1.	Agent creates quotation and downloads PDF instantly.
+2.	System auto-checks thresholds and flags as “High-Value” if exceeded.
+3.	Quotation stored automatically in system and displayed:
+o	⚠️ High-Value Quotation: ₹12,00,000 (by Agent Ramesh)
+4.	Admin Dashboard: Displays all quotations, with “High-Value” tags.
+5.	MD Dashboard: Dedicated section showing flagged quotations by date, agent, client, and value.
+________________________________________
+Optional Future Feature
+Admin or MD can enable:
+Approval Required Mode — toggle ON/OFF in settings.
+•	When OFF → Flag-only mode (default; agents free to download PDFs).
+•	When ON → Quotation approval required before finalization (for large or sensitive loans).
+________________________________________
+Notifications
+•	Real-time alerts for new high-value quotations to Admin and MD.
+•	Dashboard badge showing pending high-value reviews.
+•	Daily summary email to MD (optional).
+________________________________________
+Acceptance Criteria
+•	Agent can instantly generate and download PDF quotations.
+•	Quotations above thresholds are flagged as “High-Value” (visual only).
+•	MD sees all flagged quotations in dashboard summary.
+•	System supports future “Approval Required” toggle in settings.
+•	Configurable thresholds per loan product.
+•	Reports show high-value quotation count and total amount.
+________________________________________
+5. Quotation Management
+Features
+•	Create, edit, and export loan quotations.
+•	Auto-fill client and loan details for faster generation.
+•	Quotation templates for personal, business, or vehicle loans.
+•	Statuses: Draft → Finalized → PDF Generated → Shared.
+•	Quotation can be regenerated, revised, or versioned.
+________________________________________
+6. Loan Process Tracking
+Features
+•	Track each client’s loan journey manually (no bank API integration).
+•	6 custom stages (editable labels):
+o	Application Submitted
+o	Document Verification
+o	Credit Appraisal
+o	Sanction
+o	Agreement Signed
+o	Disbursement Ready
+•	Each stage includes:
+o	Date, remarks, uploaded proof.
+•	Final stage triggers loan-ready notification to Admin and MD.
+________________________________________
+7. Employee Management
+Features
+•	Add and manage employees (agents, admins, managers).
+•	Assign roles, branches, and loan targets.
+•	Track conversion rates and performance KPIs.
+•	Team-wise reporting and leaderboards.
+________________________________________ 8. Attendance Management
+Agent App
+•	Mark attendance with:
+o	Live selfie photo (camera only, no gallery).
+o	GPS location (lat-long + address).
+o	Auto date/time capture.
+o	Short work description (e.g., “Client visit – Ramesh & Sons”).
+Admin Dashboard
+•	View all attendance with filters (agent, date, location).
+•	Edit/delete attendance (with mandatory reason logged).
+•	Optional geo-fence validation (check-in radius limit).
+•	Attendance export in Excel/PDF format.
+•	Dashboard shows today’s attendance summary.
+________________________________________
+9. Payroll Management
+Features
+•	Attendance-linked payroll calculation.
+•	Components:
+o	Basic, incentive, deductions, commission, bonus.
+•	Auto-generate salary slips (PDF).
+•	Multi-approval workflow (Agent → Admin → Finance).
+•	Payroll report by month or employee.
+________________________________________
+10. Notifications & Reminders
+Automatic Alerts
+•	Client top-up due (12-month reminder).
+•	Loan process stage completion.
+•	High-value quotations created.
+•	Attendance missing or late.
+•	Payroll pending or generated.
+Channels
+•	In-app alerts
+•	Email
+•	Optional SMS/WhatsApp integration
+________________________________________
+11. Managing Director (MD) Role
+Key Modules
+1.	Executive Dashboard
+o	Daily disbursements, conversions, top-ups due, and high-value quotes.
+o	Conversion funnel (Leads → Approvals → Disbursements).
+o	Agent leaderboard (conversion %, total ₹ handled).
+2.	Policy & Configuration
+o	Define quotation thresholds, top-up tenure, attendance rules.
+o	Toggle “Approval Required” mode for high-value quotations.
+o	Manage incentive/commission structures.
+3.	Compliance & Audit
+o	View all changes (edits, deletions, approvals).
+o	Filter logs by user, date, or module.
+4.	Reports & Insights
+o	Disbursement trends (daily/monthly).
+o	Agent and loan-type performance.
+o	Top-up conversion reports.
+o	High-value quotation summary.
+________________________________________
+12. Reports & Analytics
+Available Reports
+•	Loan disbursement summary
+•	Conversion funnel
+•	High-value quotation tracker
+•	Attendance compliance
+•	Payroll register
+•	Top-up eligible clients
+Export formats: CSV, Excel, PDF.
+________________________________________
+13. Security & Compliance
+•	Live selfie enforcement (camera-only).
+•	Geo-tag + timestamp validation.
+•	Role-based access control (RBAC).
+•	Full audit trail for sensitive changes.
+•	Secure document uploads with file-type and virus validation.
+•	Optional IP restrictions for admin/MD dashboards.
+________________________________________
+Acceptance Summary
+Requirement	Status
+Agents can create and download quotations instantly	✅
+High-value quotations automatically flagged	✅
+MD can view flagged quotations in dashboard	✅
+Approval toggle available for future use	✅
+Top-up reminders generated automatically	✅
+Attendance captures selfie, GPS, and description	✅
+Admin can edit/delete attendance with reason	✅
+Payroll linked to attendance	✅
+Loan tracking uses 6 manual stages	✅
+Reports downloadable (CSV/Excel/PDF)	✅
+Amounts displayed in INR (Indian format)	✅
+________________________________________
+Optional Future Enhancements
+•	Geo-fencing and route tracking for field agents.
+•	CRM-style task reminders and client follow-up history.
+•	WhatsApp business message integration.
+•	e-KYC integration (if client wants automation later).
+•	Auto email with quotation PDF to clients.
+________________________________________
+This is the final FinFLow PRD prompt (production version).
+It combines real-world field usability (instant PDF) + managerial oversight (flag visibility) + future configurability (approval toggle).
