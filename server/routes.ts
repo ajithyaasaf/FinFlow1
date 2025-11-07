@@ -128,6 +128,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Import client routes
+  const clientRoutes = await import("./routes/clients");
+  clientRoutes.registerClientRoutes(app, verifyToken);
+
+  // Import quotation routes
+  const quotationRoutes = await import("./routes/quotations");
+  quotationRoutes.registerQuotationRoutes(app, verifyToken);
+
+  // Import loan routes
+  const loanRoutes = await import("./routes/loans");
+  loanRoutes.registerLoanRoutes(app, verifyToken);
+
+  // Import attendance routes
+  const attendanceRoutes = await import("./routes/attendance");
+  attendanceRoutes.registerAttendanceRoutes(app, verifyToken);
+
+  // Import file upload routes
+  const uploadRoutes = await import("./routes/uploads");
+  uploadRoutes.registerUploadRoutes(app, verifyToken);
+
   const httpServer = createServer(app);
   return httpServer;
 }
