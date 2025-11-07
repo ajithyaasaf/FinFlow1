@@ -7,7 +7,7 @@ import type { AuthRequest } from "./types";
 export async function registerRoutes(app: Express): Promise<Server> {
 
   // POST /api/users/create - Create user with role (Admin only)
-  app.post("/api/users/create", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+  app.post("/api/users/create", verifyToken, requireAdmin, async (req: any, res: Response) => {
     try {
       const { email, password, displayName, role } = req.body;
 
@@ -39,7 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/users/set-role - Update user role (Admin only)
-  app.post("/api/users/set-role", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+  app.post("/api/users/set-role", verifyToken, requireAdmin, async (req: any, res: Response) => {
     try {
       const { uid, role } = req.body;
 
@@ -114,6 +114,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import document routes
   const documentRoutes = await import("./routes/documents");
   documentRoutes.registerDocumentRoutes(app);
+
+  // Import employee routes
+  const employeeRoutes = await import("./routes/employees");
+  employeeRoutes.registerEmployeeRoutes(app);
+
+  // Import payroll routes
+  const payrollRoutes = await import("./routes/payroll");
+  payrollRoutes.registerPayrollRoutes(app);
+
+  // Import policy routes
+  const policyRoutes = await import("./routes/policy");
+  policyRoutes.registerPolicyRoutes(app);
+
+  // Import notification routes
+  const notificationRoutes = await import("./routes/notifications");
+  notificationRoutes.registerNotificationRoutes(app);
+
+  // Import report routes
+  const reportRoutes = await import("./routes/reports");
+  reportRoutes.registerReportRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

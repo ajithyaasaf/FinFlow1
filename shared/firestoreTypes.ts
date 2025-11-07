@@ -254,14 +254,116 @@ export interface Notification {
   createdAt: Date | Timestamp;
 }
 
+// Payroll
+export type PayrollStatus = "draft" | "pending_approval" | "approved" | "paid";
+
+export interface PayrollComponent {
+  name: string;
+  amount: number;
+  type: "earning" | "deduction";
+}
+
+export interface Payroll {
+  id: string;
+  
+  // Employee Details
+  employeeId: string;
+  employeeName: string;
+  employeeEmail: string;
+  
+  // Period
+  month: number; // 1-12
+  year: number;
+  
+  // Attendance Data
+  totalWorkingDays: number;
+  daysPresent: number;
+  daysAbsent: number;
+  
+  // Salary Components
+  basicSalary: number;
+  components: PayrollComponent[]; // Incentives, deductions, bonuses, etc.
+  
+  // Calculations
+  grossSalary: number;
+  totalDeductions: number;
+  netSalary: number;
+  
+  // Status and Approvals
+  status: PayrollStatus;
+  approvedBy?: string; // UID of approver
+  approvedAt?: Date | Timestamp;
+  paidAt?: Date | Timestamp;
+  
+  // PDF Slip
+  payslipUrl?: string; // Firebase Storage URL
+  
+  // Notes
+  notes?: string;
+  
+  createdBy: string;
+  createdAt: Date | Timestamp;
+  updatedAt: Date | Timestamp;
+}
+
+// Dashboard Statistics
+export interface DashboardStats {
+  totalDisbursements: number;
+  totalDisbursementsAmount: number;
+  activeLoans: number;
+  activeLoansAmount: number;
+  conversionRate: number;
+  topUpsDue: number;
+  highValueQuotations: number;
+  monthlyDisbursements: number;
+  monthlyDisbursementsAmount: number;
+}
+
+// Reports
+export type ReportType = 
+  | "disbursement_summary" 
+  | "conversion_funnel" 
+  | "high_value_quotations" 
+  | "attendance_compliance" 
+  | "payroll_register" 
+  | "top_up_eligible" 
+  | "agent_performance";
+
+export interface Report {
+  id: string;
+  type: ReportType;
+  title: string;
+  description?: string;
+  
+  // Filters
+  filters: {
+    startDate?: Date | Timestamp;
+    endDate?: Date | Timestamp;
+    agentId?: string;
+    loanType?: string;
+    branch?: string;
+    [key: string]: any;
+  };
+  
+  // Data
+  data: any; // Report-specific data structure
+  
+  // Export
+  exportedBy: string;
+  exportedAt: Date | Timestamp;
+  exportUrl?: string; // CSV/Excel file URL
+}
+
 // Audit Logs
 export interface AuditLog {
   id: string;
   userId: string; // UID of user who performed action
   userName: string;
   action: string; // e.g., "created_client", "updated_loan", "deleted_attendance"
-  entityType: "client" | "quotation" | "loan" | "attendance" | "employee" | "policy";
+  entityType: "client" | "quotation" | "loan" | "attendance" | "employee" | "policy" | "payroll";
   entityId: string;
   changes?: any; // JSON of what changed
   timestamp: Date | Timestamp;
+  ipAddress?: string;
+  userAgent?: string;
 }
