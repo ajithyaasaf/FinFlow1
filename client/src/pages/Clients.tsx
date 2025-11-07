@@ -25,12 +25,13 @@ export default function Clients() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  const { data: clients = [], isLoading } = useQuery<Client[]>({
+  const { data: clients = [], isLoading, isFetching } = useQuery<Client[]>({
     queryKey: ["/api/clients", statusFilter, searchQuery],
     queryFn: () => clientsApi.getAll({
       status: statusFilter === "all" ? undefined : statusFilter,
       search: searchQuery || undefined,
     }),
+    placeholderData: (previousData) => previousData,
   });
 
   const createMutation = useMutation({
