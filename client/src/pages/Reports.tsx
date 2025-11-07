@@ -16,25 +16,25 @@ import { formatINR } from "@/lib/utils";
 import type { DashboardStats } from "@shared/firestoreTypes";
 
 export default function Reports() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [period, setPeriod] = useState("month");
   
   const { data: stats } = useQuery<DashboardStats>({
     queryKey: ["/api/reports/dashboard-stats"],
-    enabled: user?.role === "admin" || user?.role === "md",
+    enabled: userProfile?.role === "admin" || userProfile?.role === "md",
   });
 
   const { data: disbursementSummary } = useQuery({
     queryKey: ["/api/reports/disbursement-summary"],
-    enabled: user?.role === "admin" || user?.role === "md",
+    enabled: userProfile?.role === "admin" || userProfile?.role === "md",
   });
 
   const { data: agentPerformance } = useQuery({
     queryKey: ["/api/reports/agent-performance"],
-    enabled: user?.role === "admin" || user?.role === "md",
+    enabled: userProfile?.role === "admin" || userProfile?.role === "md",
   });
 
-  if (user?.role !== "admin" && user?.role !== "md") {
+  if (userProfile?.role !== "admin" && userProfile?.role !== "md") {
     return (
       <div className="p-8">
         <Card>

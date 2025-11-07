@@ -3,22 +3,24 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, Trash } from "lucide-react";
+import { Bell, Check, Trash, TrendingUp, Star, RefreshCw, MapPin, Megaphone } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Notification } from "@shared/firestoreTypes";
 
 export default function Notifications() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const { toast } = useToast();
 
   const { data: notifications = [], isLoading } = useQuery<Notification[]>({
     queryKey: ["/api/notifications"],
+    enabled: userProfile?.role === "admin" || userProfile?.role === "md" || userProfile?.role === "agent",
   });
 
   const { data: unreadCount } = useQuery<{ count: number }>({
     queryKey: ["/api/notifications/unread-count"],
+    enabled: userProfile?.role === "admin" || userProfile?.role === "md" || userProfile?.role === "agent",
   });
 
   const markAsReadMutation = useMutation({
@@ -53,19 +55,33 @@ export default function Notifications() {
   });
 
   const getNotificationIcon = (type: string) => {
+    const iconClass = "w-5 h-5";
     switch (type) {
       case "top_up":
-        return "📈";
+        return <TrendingUp className={iconClass} />;
       case "high_value_quotation":
-        return "⭐";
+        return <Star className={iconClass} />;
       case "loan_stage_update":
-        return "🔄";
+        return <RefreshCw className={iconClass} />;
       case "attendance":
-        return "📍";
+        return <MapPin className={iconClass} />;
       default:
-        return "📢";
+        return <Megaphone className={iconClass} />;
     }
   };
+
+  if (!userProfile || (userProfile.role !== "admin" && userProfile.role !== "md" && userProfile.role !== "agent")) {
+    return (
+      <div className="p-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Access Denied</CardTitle>
+            <CardDescription>You do not have permission to view this page.</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -114,7 +130,7 @@ export default function Notifications() {
                   data-testid={`notification-${notification.id}`}
                 >
                   <div className="flex items-start gap-4">
-                    <span className="text-2xl">{getNotificationIcon(notification.type)}</span>
+                    <div className="mt-1">{getNotificationIcon(notification.type)}</div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2">
                         <h4 className="font-semibold">{notification.title}</h4>

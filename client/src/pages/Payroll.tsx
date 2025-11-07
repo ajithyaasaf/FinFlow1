@@ -40,7 +40,7 @@ export default function PayrollPage() {
       month: selectedMonth,
       status: statusFilter === "all" ? undefined : statusFilter,
     }],
-    enabled: userProfile?.role === "admin" || userProfile?.role === "md" || userProfile?.role === "agent",
+    enabled: userProfile?.role === "admin" || userProfile?.role === "md",
   });
 
   const stats = {

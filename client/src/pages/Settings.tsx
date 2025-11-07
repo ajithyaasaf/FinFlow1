@@ -12,12 +12,12 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { PolicyConfig } from "@shared/firestoreTypes";
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const { toast } = useToast();
 
   const { data: policy, isLoading } = useQuery<PolicyConfig>({
     queryKey: ["/api/policy"],
-    enabled: user?.role === "admin" || user?.role === "md",
+    enabled: userProfile?.role === "admin" || userProfile?.role === "md",
   });
 
   const [formData, setFormData] = useState<PolicyConfig | null>(null);
@@ -40,7 +40,7 @@ export default function Settings() {
     }
   };
 
-  if (user?.role !== "admin" && user?.role !== "md") {
+  if (userProfile?.role !== "admin" && userProfile?.role !== "md") {
     return (
       <div className="p-8">
         <Card>
