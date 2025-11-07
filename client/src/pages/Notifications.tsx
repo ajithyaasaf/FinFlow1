@@ -115,7 +115,7 @@ export default function Notifications() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isLoading && notifications.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">Loading notifications...</div>
           ) : notifications.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">No notifications</div>

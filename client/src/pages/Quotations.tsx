@@ -244,7 +244,7 @@ export default function Quotations() {
       </div>
 
       <div className="flex-1 overflow-auto p-4">
-        {isLoading ? (
+        {isLoading && filteredQuotations.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
           </div>

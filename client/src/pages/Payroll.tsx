@@ -219,7 +219,7 @@ export default function PayrollPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isLoading && payrolls.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">Loading payroll...</div>
           ) : payrolls.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">

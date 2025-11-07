@@ -59,7 +59,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statsLoading ? (
+        {statsLoading && !stats ? (
           <>
             {[1, 2, 3, 4].map((i) => (
               <Card key={i} className="p-6">
@@ -101,7 +101,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 space-y-6">
           <Card className="p-6">
             <h3 className="font-semibold text-lg mb-6">Monthly Performance</h3>
-            {statsLoading ? (
+            {statsLoading && !stats ? (
               <Skeleton className="w-full h-[300px]" />
             ) : stats?.monthlyDisbursements ? (
               <div className="space-y-4">

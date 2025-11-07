@@ -183,7 +183,7 @@ export default function Employees() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {isLoading && filteredEmployees.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">Loading employees...</div>
           ) : filteredEmployees.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">No employees found</div>
