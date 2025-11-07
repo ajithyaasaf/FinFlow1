@@ -83,9 +83,15 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)"],
-        serif: ["var(--font-serif)"],
+        sans: ["Inter", "var(--font-sans)"],
+        serif: ["DM Sans", "var(--font-serif)"],
         mono: ["var(--font-mono)"],
+      },
+      fontSize: {
+        'xs': ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.05em' }],
+      },
+      fontVariantNumeric: {
+        'tabular-nums': 'tabular-nums',
       },
       keyframes: {
         "accordion-down": {
