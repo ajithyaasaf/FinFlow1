@@ -24,6 +24,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 
 const menuItems = {
   main: [
@@ -42,6 +43,42 @@ const menuItems = {
     { title: "Settings", icon: Settings, url: "/settings" },
   ],
 };
+
+function UserProfileFooter() {
+  const { user, userProfile } = useAuth();
+  
+  if (!user || !userProfile) {
+    return null;
+  }
+
+  const initials = userProfile.displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  return (
+    <div className="flex items-center gap-3 p-2 rounded-md hover-elevate">
+      <Avatar className="w-9 h-9">
+        <AvatarFallback className="bg-primary/10 text-primary text-sm">
+          {initials}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-sm truncate">{userProfile.displayName}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-muted-foreground truncate">
+            {userProfile.email}
+          </p>
+          <Badge variant="secondary" className="text-xs px-1 py-0 h-4">
+            {userProfile.role.toUpperCase()}
+          </Badge>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AppSidebar() {
   const [location] = useLocation();
@@ -142,19 +179,7 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4 border-t">
-        <div className="flex items-center gap-3 p-2 rounded-md hover-elevate">
-          <Avatar className="w-9 h-9">
-            <AvatarFallback className="bg-primary/10 text-primary text-sm">
-              AD
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm truncate">Admin User</p>
-            <p className="text-xs text-muted-foreground truncate">
-              admin@finflow.com
-            </p>
-          </div>
-        </div>
+        <UserProfileFooter />
       </SidebarFooter>
     </Sidebar>
   );
