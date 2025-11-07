@@ -169,9 +169,12 @@ export default function Login() {
           Sign in with Google
         </Button>
 
-        <p className="text-xs text-center text-muted-foreground mt-6">
-          Demo credentials: admin@finflow.com / admin123
-        </p>
+        <div className="text-xs text-center text-muted-foreground mt-6 space-y-1">
+          <p className="font-semibold">Demo Credentials:</p>
+          <p>Admin: admin@finflow.com / admin123</p>
+          <p>Agent: agent@finflow.com / agent123</p>
+          <p>MD: md@finflow.com / md123456</p>
+        </div>
       </Card>
     </div>
   );

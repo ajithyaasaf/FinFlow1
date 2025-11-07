@@ -18,7 +18,7 @@ export async function createDemoUsers() {
     },
     {
       email: "md@finflow.com",
-      password: "md123",
+      password: "md123456",
       displayName: "Managing Director",
       role: "md" as const,
     },
@@ -26,29 +26,52 @@ export async function createDemoUsers() {
 
   for (const user of demoUsers) {
     try {
-      // Create user in Firebase Auth
-      const userRecord = await adminAuth.createUser({
-        email: user.email,
-        password: user.password,
-        displayName: user.displayName,
-      });
-
-      // Create user profile in Firestore
-      await adminDb.collection("users").doc(userRecord.uid).set({
-        uid: userRecord.uid,
-        email: user.email,
-        displayName: user.displayName,
-        role: user.role,
-        createdAt: new Date(),
-      });
-
-      console.log(`Created demo user: ${user.email}`);
-    } catch (error: any) {
-      if (error.code === "auth/email-already-exists") {
+      // Check if user already exists
+      let userRecord;
+      try {
+        userRecord = await adminAuth.getUserByEmail(user.email);
         console.log(`User ${user.email} already exists`);
-      } else {
-        console.error(`Error creating user ${user.email}:`, error);
+        
+        // Update custom claims for existing user
+        await adminAuth.setCustomUserClaims(userRecord.uid, { role: user.role });
+        
+        // Update user profile in Firestore
+        await adminDb.collection("users").doc(userRecord.uid).set({
+          uid: userRecord.uid,
+          email: user.email,
+          displayName: user.displayName,
+          role: user.role,
+          createdAt: new Date(),
+        }, { merge: true });
+        
+      } catch (error: any) {
+        if (error.code === "auth/user-not-found") {
+          // Create user in Firebase Auth
+          userRecord = await adminAuth.createUser({
+            email: user.email,
+            password: user.password,
+            displayName: user.displayName,
+          });
+
+          // Set custom claims for role
+          await adminAuth.setCustomUserClaims(userRecord.uid, { role: user.role });
+
+          // Create user profile in Firestore
+          await adminDb.collection("users").doc(userRecord.uid).set({
+            uid: userRecord.uid,
+            email: user.email,
+            displayName: user.displayName,
+            role: user.role,
+            createdAt: new Date(),
+          });
+
+          console.log(`Created demo user: ${user.email} with role: ${user.role}`);
+        } else {
+          throw error;
+        }
       }
+    } catch (error: any) {
+      console.error(`Error setting up user ${user.email}:`, error);
     }
   }
 }
