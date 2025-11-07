@@ -119,8 +119,8 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
       // Get role from custom claims (more secure)
       const user = auth.currentUser;
       if (user) {
-        // Force refresh to ensure we have latest custom claims
-        const idTokenResult = await user.getIdTokenResult(true);
+        // Get token without forcing refresh (cached token is fine)
+        const idTokenResult = await user.getIdTokenResult(false);
         profile.role = (idTokenResult.claims.role as UserRole) || profile.role || "agent";
       }
       

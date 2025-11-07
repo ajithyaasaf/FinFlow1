@@ -7,7 +7,6 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import AppSidebar from "@/components/AppSidebar";
 import ThemeToggle from "@/components/ThemeToggle";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import Dashboard from "@/pages/Dashboard";
 import Clients from "@/pages/Clients";
 import Quotations from "@/pages/Quotations";
@@ -21,91 +20,44 @@ import Settings from "@/pages/Settings";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 import { signOut } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 
-function Router() {
+function AuthenticatedRouter() {
   return (
     <Switch>
-      <Route path="/login" component={Login} />
-      <Route path="/">
-        {() => (
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/clients">
-        {() => (
-          <ProtectedRoute>
-            <Clients />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/quotations">
-        {() => (
-          <ProtectedRoute>
-            <Quotations />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/loans">
-        {() => (
-          <ProtectedRoute>
-            <Loans />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/attendance">
-        {() => (
-          <ProtectedRoute>
-            <Attendance />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/employees">
-        {() => (
-          <ProtectedRoute>
-            <Employees />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/payroll">
-        {() => (
-          <ProtectedRoute>
-            <Payroll />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/reports">
-        {() => (
-          <ProtectedRoute>
-            <Reports />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/notifications">
-        {() => (
-          <ProtectedRoute>
-            <Notifications />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/settings">
-        {() => (
-          <ProtectedRoute>
-            <Settings />
-          </ProtectedRoute>
-        )}
-      </Route>
+      <Route path="/" component={Dashboard} />
+      <Route path="/clients" component={Clients} />
+      <Route path="/quotations" component={Quotations} />
+      <Route path="/loans" component={Loans} />
+      <Route path="/attendance" component={Attendance} />
+      <Route path="/employees" component={Employees} />
+      <Route path="/payroll" component={Payroll} />
+      <Route path="/reports" component={Reports} />
+      <Route path="/notifications" component={Notifications} />
+      <Route path="/settings" component={Settings} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
+function UnauthenticatedRouter() {
+  return (
+    <Switch>
+      <Route path="/login" component={Login} />
+      <Route path="*">
+        {() => {
+          window.location.href = "/login";
+          return null;
+        }}
+      </Route>
+    </Switch>
+  );
+}
+
 function AppContent() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { toast } = useToast();
   
   const style = {
@@ -129,10 +81,21 @@ function AppContent() {
     }
   };
 
-  if (!user) {
-    return <Router />;
+  // Show loading spinner only on initial auth check
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
+  // If not authenticated, show login flow
+  if (!user) {
+    return <UnauthenticatedRouter />;
+  }
+
+  // If authenticated, show the main app with sidebar
   return (
     <SidebarProvider style={style as React.CSSProperties}>
       <div className="flex h-screen w-full">
@@ -154,7 +117,7 @@ function AppContent() {
             </div>
           </header>
           <main className="flex-1 overflow-auto p-8">
-            <Router />
+            <AuthenticatedRouter />
           </main>
         </div>
       </div>
