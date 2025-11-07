@@ -83,6 +83,10 @@ export function registerEmployeeRoutes(app: Express) {
 
   app.get("/api/employees/:uid", verifyToken, async (req: any, res: Response) => {
     try {
+      if (req.user.role !== "admin" && req.user.role !== "md" && req.user.uid !== req.params.uid) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
       const doc = await adminDb.collection("users").doc(req.params.uid).get();
       
       if (!doc.exists) {

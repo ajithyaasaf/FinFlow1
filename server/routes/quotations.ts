@@ -244,7 +244,7 @@ export function registerQuotationRoutes(app: Express) {
   });
 
   // DELETE /api/quotations/:id - Delete a quotation (Admin only)
-  app.delete("/api/quotations/:id", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+  app.delete("/api/quotations/:id", verifyToken, requireAdmin, async (req: any, res: Response) => {
     try {
       
       const docRef = adminDb.collection("quotations").doc(req.params.id);
@@ -273,6 +273,47 @@ export function registerQuotationRoutes(app: Express) {
       res.json({ success: true });
     } catch (error: any) {
       console.error("Error deleting quotation:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // POST /api/quotations/:id/generate-pdf - Generate PDF for quotation
+  app.post("/api/quotations/:id/generate-pdf", verifyToken, async (req: any, res: Response) => {
+    try {
+      const doc = await adminDb.collection("quotations").doc(req.params.id).get();
+      
+      if (!doc.exists) {
+        return res.status(404).json({ error: "Quotation not found" });
+      }
+      
+      const quotation = { ...doc.data(), id: doc.id } as Quotation;
+      
+      if (req.user.role !== "admin" && req.user.role !== "md" && quotation.agentId !== req.user.uid) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+      
+      const { generateQuotationPDF } = await import("../lib/pdfGenerator");
+      const pdf = generateQuotationPDF(quotation);
+      
+      const pdfBuffer = Buffer.from(pdf.output('arraybuffer'));
+      
+      const userDoc = await adminDb.collection("users").doc(req.user.uid).get();
+      const userData = userDoc.data();
+      
+      await adminDb.collection("audit_logs").add({
+        userId: req.user.uid,
+        userName: userData?.displayName || req.user.email,
+        action: "generated_quotation_pdf",
+        entityType: "quotation",
+        entityId: req.params.id,
+        timestamp: new Date(),
+      });
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="quotation-${quotation.quotationNumber}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error: any) {
+      console.error("Error generating PDF:", error);
       res.status(500).json({ error: error.message });
     }
   });

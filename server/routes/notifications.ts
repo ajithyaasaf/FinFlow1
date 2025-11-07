@@ -57,8 +57,12 @@ export function registerNotificationRoutes(app: Express) {
     try {
       const validatedData = createNotificationSchema.parse(req.body);
       
+      if (!validatedData.userId) {
+        return res.status(400).json({ error: "userId is required for single notifications. Use /api/notifications/broadcast for broadcasting." });
+      }
+      
       const notificationData: Omit<Notification, "id"> = {
-        userId: validatedData.userId || req.user.uid,
+        userId: validatedData.userId,
         type: validatedData.type,
         title: validatedData.title,
         message: validatedData.message,

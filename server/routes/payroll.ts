@@ -70,7 +70,7 @@ export function registerPayrollRoutes(app: Express) {
         return res.status(404).json({ error: "Payroll record not found" });
       }
       
-      const payroll = { ...doc.data(), id: doc.id };
+      const payroll = { ...doc.data(), id: doc.id } as Payroll;
       
       if (req.user.role !== "admin" && req.user.role !== "md") {
         if (payroll.employeeId !== req.user.uid) {
