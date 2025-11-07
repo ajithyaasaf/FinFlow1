@@ -1,46 +1,14 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { adminAuth, adminDb } from "./firebaseAdmin";
-
-// Extend Express Request to include user
-interface AuthRequest extends Request {
-  user?: {
-    uid: string;
-    email?: string;
-    role?: string;
-  };
-}
+import { verifyToken, requireAdmin } from "./middleware/auth";
+import type { AuthRequest } from "./types";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Middleware to verify Firebase token and attach user to request
-  const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split("Bearer ")[1];
-    
-    if (!token) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    try {
-      const decodedToken = await adminAuth.verifyIdToken(token);
-      req.user = {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
-        role: decodedToken.role,
-      };
-      next();
-    } catch (error) {
-      return res.status(401).json({ error: "Invalid token" });
-    }
-  };
 
   // POST /api/users/create - Create user with role (Admin only)
-  app.post("/api/users/create", verifyToken, async (req: AuthRequest, res: Response) => {
+  app.post("/api/users/create", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      // Check if requester is admin
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can create users" });
-      }
-
       const { email, password, displayName, role } = req.body;
 
       // Create user in Firebase Auth
@@ -71,13 +39,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // POST /api/users/set-role - Update user role (Admin only)
-  app.post("/api/users/set-role", verifyToken, async (req: AuthRequest, res: Response) => {
+  app.post("/api/users/set-role", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      // Check if requester is admin
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can set roles" });
-      }
-
       const { uid, role } = req.body;
 
       // Set custom claims
@@ -130,23 +93,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Import client routes
   const clientRoutes = await import("./routes/clients");
-  clientRoutes.registerClientRoutes(app, verifyToken);
+  clientRoutes.registerClientRoutes(app);
 
   // Import quotation routes
   const quotationRoutes = await import("./routes/quotations");
-  quotationRoutes.registerQuotationRoutes(app, verifyToken);
+  quotationRoutes.registerQuotationRoutes(app);
 
   // Import loan routes
   const loanRoutes = await import("./routes/loans");
-  loanRoutes.registerLoanRoutes(app, verifyToken);
+  loanRoutes.registerLoanRoutes(app);
 
   // Import attendance routes
   const attendanceRoutes = await import("./routes/attendance");
-  attendanceRoutes.registerAttendanceRoutes(app, verifyToken);
+  attendanceRoutes.registerAttendanceRoutes(app);
 
   // Import file upload routes
   const uploadRoutes = await import("./routes/uploads");
-  uploadRoutes.registerUploadRoutes(app, verifyToken);
+  uploadRoutes.registerUploadRoutes(app);
+  
+  // Import document routes
+  const documentRoutes = await import("./routes/documents");
+  documentRoutes.registerDocumentRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

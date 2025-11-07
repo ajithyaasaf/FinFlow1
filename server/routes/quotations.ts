@@ -1,5 +1,6 @@
 import type { Express, Response } from "express";
 import { adminDb } from "../firebaseAdmin";
+import { verifyToken, requireAdmin, requireRole } from "../middleware/auth";
 import { createQuotationSchema, updateQuotationSchema } from "../lib/validation";
 import { 
   generateQuotationNumber, 
@@ -7,16 +8,9 @@ import {
   calculateEMI 
 } from "../lib/quotationLogic";
 import type { Quotation } from "@shared/firestoreTypes";
+import type { AuthRequest } from "../types";
 
-interface AuthRequest extends Request {
-  user?: {
-    uid: string;
-    email?: string;
-    role?: string;
-  };
-}
-
-export function registerQuotationRoutes(app: Express, verifyToken: any) {
+export function registerQuotationRoutes(app: Express) {
   // GET /api/quotations - Get all quotations
   app.get("/api/quotations", verifyToken, async (req: any, res: Response) => {
     try {
@@ -250,11 +244,8 @@ export function registerQuotationRoutes(app: Express, verifyToken: any) {
   });
 
   // DELETE /api/quotations/:id - Delete a quotation (Admin only)
-  app.delete("/api/quotations/:id", verifyToken, async (req: any, res: Response) => {
+  app.delete("/api/quotations/:id", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      if (req.user.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can delete quotations" });
-      }
       
       const docRef = adminDb.collection("quotations").doc(req.params.id);
       const doc = await docRef.get();

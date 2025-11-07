@@ -2,7 +2,6 @@ import { adminStorage } from "../firebaseAdmin";
 import { randomUUID } from "crypto";
 
 export interface UploadedFile {
-  url: string;
   path: string;
   name: string;
   contentType: string;
@@ -10,15 +9,14 @@ export interface UploadedFile {
 
 /**
  * Generate a signed upload URL for direct client uploads to Firebase Storage
- * This allows secure uploads without exposing storage credentials to clients
- * Files are made public after upload for access
+ * Returns ONLY the upload URL and storage path. Download URLs are generated on-demand.
  */
 export async function generateUploadUrl(
   folder: string,
   fileName: string,
   contentType: string,
   resourceType: "client" | "attendance" | "quotation" = "client"
-): Promise<{ uploadUrl: string; downloadUrl: string; path: string }> {
+): Promise<{ uploadUrl: string; path: string }> {
   const bucket = adminStorage.bucket();
   const uniqueId = randomUUID();
   const extension = fileName.split('.').pop();
@@ -35,20 +33,12 @@ export async function generateUploadUrl(
     contentType,
   });
 
-  // Generate signed download URL (valid for 7 days)
-  // This ensures files are accessible without making them fully public
-  const [downloadUrl] = await file.getSignedUrl({
-    version: "v4",
-    action: "read",
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
-
-  return { uploadUrl, downloadUrl, path: securePath };
+  return { uploadUrl, path: securePath };
 }
 
 /**
  * Upload a file buffer directly to Firebase Storage (for server-side uploads)
- * Generates a signed download URL for secure access
+ * Returns storage path only. Download URLs generated on-demand.
  */
 export async function uploadFileBuffer(
   buffer: Buffer,
@@ -56,7 +46,7 @@ export async function uploadFileBuffer(
   fileName: string,
   contentType: string,
   resourceType: "client" | "attendance" | "quotation" = "client"
-): Promise<UploadedFile> {
+): Promise<{ path: string; name: string; contentType: string }> {
   const bucket = adminStorage.bucket();
   const uniqueId = randomUUID();
   const extension = fileName.split('.').pop();
@@ -71,15 +61,7 @@ export async function uploadFileBuffer(
     },
   });
 
-  // Generate signed download URL (valid for 7 days)
-  const [url] = await file.getSignedUrl({
-    version: "v4",
-    action: "read",
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-  });
-
   return {
-    url,
     path: securePath,
     name: fileName,
     contentType,

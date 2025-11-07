@@ -1,16 +1,10 @@
 import type { Express, Response } from "express";
 import { adminDb } from "../firebaseAdmin";
+import { verifyToken, requireAdmin, requireRole } from "../middleware/auth";
 import { createLoanSchema, updateLoanStageSchema } from "../lib/validation";
 import { generateLoanNumber, calculateEMI } from "../lib/quotationLogic";
 import type { Loan, LoanStageDetail, LoanStage } from "@shared/firestoreTypes";
-
-interface AuthRequest extends Request {
-  user?: {
-    uid: string;
-    email?: string;
-    role?: string;
-  };
-}
+import type { AuthRequest } from "../types";
 
 const STAGE_LABELS = {
   application_submitted: "Application Submitted",
@@ -29,7 +23,7 @@ function initializeLoanStages(): LoanStageDetail[] {
   }));
 }
 
-export function registerLoanRoutes(app: Express, verifyToken: any) {
+export function registerLoanRoutes(app: Express) {
   // GET /api/loans - Get all loans
   app.get("/api/loans", verifyToken, async (req: any, res: Response) => {
     try {
@@ -79,11 +73,8 @@ export function registerLoanRoutes(app: Express, verifyToken: any) {
   });
 
   // POST /api/loans - Create a new loan (Admin only)
-  app.post("/api/loans", verifyToken, async (req: any, res: Response) => {
+  app.post("/api/loans", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      if (req.user.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can create loans" });
-      }
       
       const validatedData = createLoanSchema.parse(req.body);
       
@@ -219,11 +210,8 @@ export function registerLoanRoutes(app: Express, verifyToken: any) {
   });
 
   // PATCH /api/loans/:id/disburse - Mark loan as disbursed
-  app.patch("/api/loans/:id/disburse", verifyToken, async (req: any, res: Response) => {
+  app.patch("/api/loans/:id/disburse", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      if (req.user.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can disburse loans" });
-      }
       
       const { disbursementAmount } = req.body;
       

@@ -226,7 +226,6 @@ export const uploadApi = {
   }) =>
     apiRequest<{
       uploadUrl: string;
-      downloadUrl: string;
       path: string;
       maxSizeMB: number;
     }>("/api/upload/url", {
@@ -245,8 +244,8 @@ export const uploadApi = {
     }),
   
   uploadFile: async (file: File, resourceId: string, fileType: "document" | "image" | "selfie") => {
-    // First, get signed URL
-    const { uploadUrl, downloadUrl } = await uploadApi.getUploadUrl({
+    // First, get signed upload URL
+    const { uploadUrl, path } = await uploadApi.getUploadUrl({
       fileName: file.name,
       contentType: file.type,
       resourceId,
@@ -266,6 +265,16 @@ export const uploadApi = {
       throw new Error("File upload failed");
     }
     
-    return { url: downloadUrl };
+    // Return the storage path (download URLs are generated on-demand)
+    return { path };
   },
+};
+
+// Document API - Generate fresh download URLs on-demand with authorization
+export const documentsApi = {
+  // Get download URL for a specific document
+  // resourceType: "clients" | "quotations" | "attendance"
+  // documentType: "panCard" | "aadharCard" | "selfie" etc.
+  getDownloadUrl: (resourceType: string, resourceId: string, documentType: string) =>
+    apiRequest<{url: string}>(`/api/documents/${resourceType}/${resourceId}/${documentType}`),
 };

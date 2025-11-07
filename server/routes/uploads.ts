@@ -1,15 +1,9 @@
 import type { Express, Response } from "express";
+import { verifyToken } from "../middleware/auth";
 import { generateUploadUrl, validateFileType, validateFileSize, ALLOWED_DOCUMENT_TYPES, ALLOWED_IMAGE_TYPES, MAX_DOCUMENT_SIZE_MB, MAX_IMAGE_SIZE_MB } from "../lib/fileUpload";
+import type { AuthRequest } from "../types";
 
-interface AuthRequest extends Request {
-  user?: {
-    uid: string;
-    email?: string;
-    role?: string;
-  };
-}
-
-export function registerUploadRoutes(app: Express, verifyToken: any) {
+export function registerUploadRoutes(app: Express) {
   // POST /api/upload/url - Generate signed upload URL
   app.post("/api/upload/url", verifyToken, async (req: any, res: Response) => {
     try {
@@ -51,7 +45,7 @@ export function registerUploadRoutes(app: Express, verifyToken: any) {
       }
       
       // Generate upload URL with secure folder structure
-      const { uploadUrl, downloadUrl, path } = await generateUploadUrl(
+      const { uploadUrl, path } = await generateUploadUrl(
         resourceId, // This becomes the subfolder under the resource type
         fileName,
         contentType,
@@ -60,7 +54,6 @@ export function registerUploadRoutes(app: Express, verifyToken: any) {
       
       res.json({
         uploadUrl,
-        downloadUrl,
         path,
         maxSizeMB: maxSize,
       });

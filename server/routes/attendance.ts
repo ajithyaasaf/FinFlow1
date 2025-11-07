@@ -1,21 +1,15 @@
 import type { Express, Response } from "express";
 import { adminDb } from "../firebaseAdmin";
+import { verifyToken, requireAdmin, requireRole } from "../middleware/auth";
 import { 
   createAttendanceSchema, 
   updateAttendanceSchema, 
   deleteAttendanceSchema 
 } from "../lib/validation";
 import type { Attendance } from "@shared/firestoreTypes";
+import type { AuthRequest } from "../types";
 
-interface AuthRequest extends Request {
-  user?: {
-    uid: string;
-    email?: string;
-    role?: string;
-  };
-}
-
-export function registerAttendanceRoutes(app: Express, verifyToken: any) {
+export function registerAttendanceRoutes(app: Express) {
   // GET /api/attendance - Get all attendance records
   app.get("/api/attendance", verifyToken, async (req: any, res: Response) => {
     try {
@@ -130,11 +124,8 @@ export function registerAttendanceRoutes(app: Express, verifyToken: any) {
   });
 
   // PATCH /api/attendance/:id - Edit attendance (Admin only)
-  app.patch("/api/attendance/:id", verifyToken, async (req: any, res: Response) => {
+  app.patch("/api/attendance/:id", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      if (req.user.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can edit attendance" });
-      }
       
       const validatedData = updateAttendanceSchema.parse(req.body);
       
@@ -188,11 +179,8 @@ export function registerAttendanceRoutes(app: Express, verifyToken: any) {
   });
 
   // DELETE /api/attendance/:id - Soft delete attendance (Admin only)
-  app.delete("/api/attendance/:id", verifyToken, async (req: any, res: Response) => {
+  app.delete("/api/attendance/:id", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      if (req.user.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can delete attendance" });
-      }
       
       const { deleteReason } = deleteAttendanceSchema.parse(req.body);
       

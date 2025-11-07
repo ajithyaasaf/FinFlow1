@@ -18,11 +18,11 @@ export const createClientSchema = z.object({
   // Employment Details
   employmentType: z.enum(["salaried", "self_employed", "business", "other"]).optional(),
   companyName: z.string().optional(),
-  monthlyIncome: z.number().positive().optional(),
+  monthlyIncome: z.coerce.number().positive().optional(),
   
   // Loan Preference
   loanType: z.enum(["personal", "business", "vehicle", "home", "other"]).optional(),
-  requestedAmount: z.number().positive().optional(),
+  requestedAmount: z.coerce.number().positive().optional(),
   
   // Tracking
   status: z.enum(["new", "contacted", "in_progress", "converted", "not_converted"]).default("new"),
@@ -36,10 +36,10 @@ export const createQuotationSchema = z.object({
   clientId: z.string().min(1, "Client is required"),
   clientName: z.string().min(1, "Client name is required"),
   loanType: z.enum(["personal", "business", "vehicle", "home", "other"]),
-  loanAmount: z.number().positive("Loan amount must be positive"),
-  interestRate: z.number().min(0).max(100, "Interest rate must be between 0-100"),
-  tenure: z.number().int().positive("Tenure must be a positive integer"),
-  processingFee: z.number().min(0).optional(),
+  loanAmount: z.coerce.number().positive("Loan amount must be positive"),
+  interestRate: z.coerce.number().min(0).max(100, "Interest rate must be between 0-100"),
+  tenure: z.coerce.number().int().positive("Tenure must be a positive integer"),
+  processingFee: z.coerce.number().min(0).optional(),
   notes: z.string().optional(),
 });
 
@@ -50,9 +50,9 @@ export const createLoanSchema = z.object({
   clientId: z.string().min(1, "Client is required"),
   clientName: z.string().min(1, "Client name is required"),
   loanType: z.enum(["personal", "business", "vehicle", "home", "other"]),
-  loanAmount: z.number().positive("Loan amount must be positive"),
-  interestRate: z.number().min(0).max(100),
-  tenure: z.number().int().positive(),
+  loanAmount: z.coerce.number().positive("Loan amount must be positive"),
+  interestRate: z.coerce.number().min(0).max(100),
+  tenure: z.coerce.number().int().positive(),
   quotationId: z.string().optional(),
 });
 
@@ -72,8 +72,8 @@ export const updateLoanStageSchema = z.object({
 // Attendance validation schemas
 export const createAttendanceSchema = z.object({
   workDescription: z.string().min(5, "Work description must be at least 5 characters"),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  latitude: z.coerce.number().min(-90).max(90),
+  longitude: z.coerce.number().min(-180).max(180),
   address: z.string().min(5, "Address is required"),
 });
 
@@ -81,8 +81,8 @@ export const updateAttendanceSchema = z.object({
   editReason: z.string().min(5, "Edit reason is required"),
   workDescription: z.string().min(5).optional(),
   location: z.object({
-    latitude: z.number().min(-90).max(90),
-    longitude: z.number().min(-180).max(180),
+    latitude: z.coerce.number().min(-90).max(90),
+    longitude: z.coerce.number().min(-180).max(180),
     address: z.string().min(5),
   }).optional(),
 });

@@ -1,17 +1,11 @@
 import type { Express, Response } from "express";
 import { adminDb } from "../firebaseAdmin";
+import { verifyToken, requireAdmin } from "../middleware/auth";
 import { createClientSchema, updateClientSchema } from "../lib/validation";
 import type { Client } from "@shared/firestoreTypes";
+import type { AuthRequest } from "../types";
 
-interface AuthRequest extends Request {
-  user?: {
-    uid: string;
-    email?: string;
-    role?: string;
-  };
-}
-
-export function registerClientRoutes(app: Express, verifyToken: any) {
+export function registerClientRoutes(app: Express) {
   // GET /api/clients - Get all clients
   app.get("/api/clients", verifyToken, async (req: any, res: Response) => {
     try {
@@ -155,11 +149,8 @@ export function registerClientRoutes(app: Express, verifyToken: any) {
   });
 
   // DELETE /api/clients/:id - Delete a client (Admin only)
-  app.delete("/api/clients/:id", verifyToken, async (req: any, res: Response) => {
+  app.delete("/api/clients/:id", verifyToken, requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      if (req.user.role !== "admin") {
-        return res.status(403).json({ error: "Only admins can delete clients" });
-      }
       
       const docRef = adminDb.collection("clients").doc(req.params.id);
       const doc = await docRef.get();
