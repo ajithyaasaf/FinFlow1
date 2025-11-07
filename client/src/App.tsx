@@ -13,6 +13,11 @@ import Clients from "@/pages/Clients";
 import Quotations from "@/pages/Quotations";
 import Loans from "@/pages/Loans";
 import Attendance from "@/pages/Attendance";
+import Employees from "@/pages/Employees";
+import Payroll from "@/pages/Payroll";
+import Reports from "@/pages/Reports";
+import Notifications from "@/pages/Notifications";
+import Settings from "@/pages/Settings";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 import { Button } from "@/components/ui/button";
@@ -56,6 +61,41 @@ function Router() {
         {() => (
           <ProtectedRoute>
             <Attendance />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/employees">
+        {() => (
+          <ProtectedRoute>
+            <Employees />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/payroll">
+        {() => (
+          <ProtectedRoute>
+            <Payroll />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/reports">
+        {() => (
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/notifications">
+        {() => (
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/settings">
+        {() => (
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         )}
       </Route>

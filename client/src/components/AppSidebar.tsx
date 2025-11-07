@@ -37,6 +37,7 @@ const menuItems = {
   analytics: [
     { title: "Reports", icon: TrendingUp, url: "/reports" },
     { title: "Employees", icon: UserCircle, url: "/employees" },
+    { title: "Payroll", icon: DollarSign, url: "/payroll" },
   ],
   settings: [
     { title: "Notifications", icon: Bell, url: "/notifications", badge: 5 },
@@ -91,7 +92,7 @@ export default function AppSidebar() {
             <span className="text-primary-foreground font-bold text-xl">F</span>
           </div>
           <div>
-            <h2 className="font-bold text-xl font-serif">FinFLow</h2>
+            <h2 className="font-bold text-xl font-serif">FinFlow</h2>
             <p className="text-xs text-muted-foreground">Loan Management</p>
           </div>
         </div>
