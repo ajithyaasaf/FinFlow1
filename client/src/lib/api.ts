@@ -119,6 +119,20 @@ export const quotationsApi = {
     apiRequest<{success: boolean}>(`/api/quotations/${id}`, {
       method: "DELETE",
     }),
+  
+  downloadPDF: async (id: string): Promise<Blob> => {
+    const authHeaders = await getAuthHeaders(); // Get Firebase ID token
+    // Strip Content-Type for blob download (only need Authorization)
+    const { "Content-Type": _, ...headers } = authHeaders;
+    const response = await fetch(`/api/quotations/${id}/pdf`, {
+      headers,
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Failed to download PDF: ${text || response.statusText}`);
+    }
+    return response.blob();
+  },
 };
 
 // Loan API
